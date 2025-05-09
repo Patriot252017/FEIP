@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/project
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - symfony-network
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - ./:/var/www/project
+    networks:
+      - symfony-network
+    environment:
+      DATABASE_URL: "mysql://ChangeMe!!!:ChangeMe!!!@mysql:3306/app_db?serverVersion=8.0"
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ChangeMe!!!
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: ChangeMe!!!
+      MYSQL_PASSWORD: ChangeMe!!!
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - symfony-network
+
+networks:
+  symfony-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
