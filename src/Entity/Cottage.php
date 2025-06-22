@@ -2,23 +2,39 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+
+#[ORM\Entity(repositoryClass: CottageRepository::class)]
 class Cottage
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
-    private ?string $amenities = null;
-    private ?int $beds = null;
-    private ?int $distanceFromSea = null;
 
-    
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $amenities = null;
+
+    #[ORM\Column(type: 'integer')]
+    private int $beds;
+
+    #[ORM\Column(type: 'integer')]
+    private int $distanceFromSea;
+
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'cottage')]
+    private Collection $bookings;
+
+    public function __construct()
+    {
+        $this->bookings = new ArrayCollection();
+    }
+
+    // Геттеры и сеттеры
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-        return $this;
     }
 
     public function getAmenities(): ?string
@@ -26,13 +42,13 @@ class Cottage
         return $this->amenities;
     }
 
-    public function setAmenities(string $amenities): self
+    public function setAmenities(?string $amenities): self
     {
         $this->amenities = $amenities;
         return $this;
     }
 
-    public function getBeds(): ?int
+    public function getBeds(): int
     {
         return $this->beds;
     }
@@ -43,7 +59,7 @@ class Cottage
         return $this;
     }
 
-    public function getDistanceFromSea(): ?int
+    public function getDistanceFromSea(): int
     {
         return $this->distanceFromSea;
     }
@@ -52,5 +68,10 @@ class Cottage
     {
         $this->distanceFromSea = $distanceFromSea;
         return $this;
+    }
+
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
     }
 }
