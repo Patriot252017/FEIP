@@ -10,9 +10,11 @@
 /var/test.db
 /vendor/
 ###< symfony/framework-bundle ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
 
-###> phpunit/phpunit ###
+
 /phpunit.xml
 /.phpunit.cache/
-###< phpunit/phpunit ###
+
 .env.local
