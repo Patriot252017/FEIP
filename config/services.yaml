@@ -1,24 +1,51 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+# config/services.yaml
 parameters:
+    locale: 'en'
 
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
+        public: false
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
+    # Автоматическая регистрация сервисов из src/
     App\:
         resource: '../src/'
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+            - '../src/Tests/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Регистрация админ-классов Sonata
+    App\Admin\:
+        resource: '../src/Admin/'
+        tags: ['sonata.admin']
+        arguments:
+            - ~ # Код сервиса (null для автоматической генерации)
+            - ~ # Класс сущности (переопределяется в каждом классе)
+            - ~ # Контроллер (null для использования стандартного)
+            - '@security.password_hasher' # Инжектирование зависимостей для UserAdmin
+
+    # Явная регистрация UserAdmin с кастомными параметрами
+    App\Admin\UserAdmin:
+        arguments:
+            - ~
+            - App\Entity\User
+            - SonataAdminBundle:CRUD
+            - '@security.password_hasher'
+        tags:
+            - { name: sonata.admin, label: 'Users', manager_type: orm, group: 'User Management' }
+
+    # Настройки для работы с переводами
+    Sonata\AdminBundle\Filter\FilterFactory:
+        arguments:
+            - '@service_container'
+
+    # Регистрация команд (если есть)
+    App\Command\:
+        resource: '../src/Command/'
+        tags: ['console.command']
+
+    # Опционально: кастомный шаблон для SonataAdmin
+    sonata.admin.global_template: '@SonataAdmin/standard_layout.html.twig'

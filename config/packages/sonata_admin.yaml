@@ -1,0 +1,19 @@
+sonata_admin:
+    title: 'Admin Panel'
+    title_logo: 'build/images/logo.png'
+    options:
+        legacy_twig_text_extension: false
+        default_group: 'General'
+        default_label_catalogue: 'messages'
+        default_icon: 'fas fa-home'
+    dashboard:
+        groups:
+            User Management:
+                label: 'User Management'
+                icon: 'fas fa-users'
+                items:
+                    - app.admin.user
+            Content:
+                label: 'Content'
+                icon: 'fas fa-file-alt'
+                items: []
