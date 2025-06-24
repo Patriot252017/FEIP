@@ -33,96 +33,12 @@ class BookingService
     {
         $file = fopen($this->bookingsFile, 'w');
         if ($file) {
-            fputcsv($file, self::CSV_HEADERS);
+            fputcsv($file, self::CSV_HEADERS, ',', '"', '\\');
             fclose($file);
         }
     }
 
-    public function updateBooking(string $id, string $newComment): bool
-    {
-        try {
-            
-            $bookings = $this->readAllBookings();
-            $updated = false;
-
-            
-            foreach ($bookings as &$booking) {
-                if ($booking['id'] === $id) {
-                    $booking['comment'] = $newComment;
-                    $updated = true;
-                    break;
-                }
-            }
-
-            if ($updated) {
-                
-                $this->writeAllBookings($bookings);
-                $this->logger->info("Booking updated", ['id' => $id]);
-                return true;
-            }
-
-            $this->logger->warning("Booking not found", ['id' => $id]);
-            return false;
-
-        } catch (\Exception $e) {
-            $this->logger->error("Update failed", [
-                'error' => $e->getMessage(),
-                'id' => $id,
-                'trace' => $e->getTraceAsString()
-            ]);
-            return false;
-        }
-    }
-
-    private function readAllBookings(): array
-    {
-        if (!file_exists($this->bookingsFile)) {
-            return [];
-        }
-
-        $bookings = [];
-        $file = fopen($this->bookingsFile, 'r');
-        
-        
-        fgetcsv($file);
-        
-        while (($data = fgetcsv($file)) !== false) {
-            if (count($data) === count(self::CSV_HEADERS)) {
-                $bookings[] = array_combine(self::CSV_HEADERS, $data);
-            }
-        }
-        
-        fclose($file);
-        return $bookings;
-    }
-
-    private function writeAllBookings(array $bookings): void
-    {
-        $file = fopen($this->bookingsFile, 'w');
-        if (!$file) {
-            throw new \RuntimeException("Failed to open file for writing");
-        }
-
-        try {
-            
-            fputcsv($file, self::CSV_HEADERS);
-            
-            
-            foreach ($bookings as $booking) {
-                fputcsv($file, [
-                    $booking['id'],
-                    $booking['phone'],
-                    $booking['cottageId'],
-                    $booking['comment'],
-                    $booking['createdAt']
-                ]);
-            }
-        } finally {
-            fclose($file);
-        }
-    }
-
-        public function createBooking(string $phone, int $cottageId, ?string $comment = null): bool
+    public function createBooking(string $phone, int $cottageId, ?string $comment = null): bool
     {
         try {
             if (!$this->validatePhone($phone)) {
@@ -149,7 +65,7 @@ class BookingService
     {
         $file = fopen($this->bookingsFile, 'a');
         if ($file) {
-            fputcsv($file, $booking);
+            fputcsv($file, $booking, ',', '"', '\\');
             fclose($file);
         }
     }
@@ -157,6 +73,80 @@ class BookingService
     private function validatePhone(string $phone): bool
     {
         return preg_match('/^\+?\d{10,15}$/', $phone);
+    }
+
+    public function updateBooking(string $id, string $newComment): bool
+    {
+        try {
+            $bookings = $this->readAllBookings();
+            $updated = false;
+
+            foreach ($bookings as &$booking) {
+                if ($booking['id'] === $id) {
+                    $booking['comment'] = $newComment;
+                    $updated = true;
+                    break;
+                }
+            }
+
+            if ($updated) {
+                $this->writeAllBookings($bookings);
+                $this->logger->info("Booking updated", ['id' => $id]);
+                return true;
+            }
+
+            $this->logger->warning("Booking not found", ['id' => $id]);
+            return false;
+        } catch (\Exception $e) {
+            $this->logger->error("Update failed", [
+                'error' => $e->getMessage(),
+                'id' => $id
+            ]);
+            return false;
+        }
+    }
+
+    private function readAllBookings(): array
+    {
+        if (!file_exists($this->bookingsFile)) {
+            return [];
+        }
+
+        $bookings = [];
+        $file = fopen($this->bookingsFile, 'r');
+        fgetcsv($file, 0, ',', '"', '\\'); // Пропускаем заголовок
+        
+        while (($data = fgetcsv($file, 0, ',', '"', '\\')) !== false) {
+            if (count($data) === count(self::CSV_HEADERS)) {
+                $bookings[] = array_combine(self::CSV_HEADERS, $data);
+            }
+        }
+        
+        fclose($file);
+        return $bookings;
+    }
+
+    private function writeAllBookings(array $bookings): void
+    {
+        $file = fopen($this->bookingsFile, 'w');
+        if (!$file) {
+            throw new \RuntimeException("Failed to open file for writing");
+        }
+
+        try {
+            fputcsv($file, self::CSV_HEADERS, ',', '"', '\\');
+            foreach ($bookings as $booking) {
+                fputcsv($file, [
+                    $booking['id'],
+                    $booking['phone'],
+                    $booking['cottageId'],
+                    $booking['comment'],
+                    $booking['createdAt']
+                ], ',', '"', '\\');
+            }
+        } finally {
+            fclose($file);
+        }
     }
 
     public function getBooking(string $id): ?array
