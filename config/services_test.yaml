@@ -1,0 +1,19 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true  # Для возможности подмены сервисов в тестах
+
+    # Подменяем реальный API сервис на мок в тестовом окружении
+    App\Service\ExternalApiInterface:
+        class: App\Tests\Service\ExternalApiMock
+        public: true  # Важно для тестов
+
+    # Другие тестовые сервисы при необходимости
+    App\Service\HomeDataService:
+        arguments:
+            $cottagesFile: '%kernel.project_dir%/tests/fixtures/test_cottages.csv'
+
+    App\Service\BookingService:
+        arguments:
+            $bookingsFile: '%kernel.project_dir%/tests/fixtures/test_bookings.csv'

@@ -3,3 +3,13 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+api_cottages_external:
+  path: /api/cottages/external
+  controller: App\Controller\BookingController::getExternalCottages
+  methods: GET
+
+api_bookings_external:
+  path: /api/bookings/external
+  controller: App\Controller\BookingController::createExternalBooking
+  methods: POST
