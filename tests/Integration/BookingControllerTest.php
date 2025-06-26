@@ -5,6 +5,8 @@ namespace App\Tests\integration;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Psr\Log\NullLogger;
+use App\Service\HomeDataService;
+use App\Service\BookingService;
 
 class BookingControllerTest extends WebTestCase
 {
@@ -35,10 +37,10 @@ class BookingControllerTest extends WebTestCase
         $client = static::createClient();
         
         $container = $client->getContainer();
-        $container->set('App\Service\HomeDataService', 
-            new \App\Service\HomeDataService(self::$testCottagesFile));
-        $container->set('App\Service\BookingService', 
-            new \App\Service\BookingService(self::$testBookingsFile, self::$logger));
+        $container->set(HomeDataService::class, 
+            new HomeDataService(self::$testCottagesFile));
+        $container->set(BookingService::class, 
+            new BookingService(self::$testBookingsFile, self::$logger));
 
         $client->request(
             'POST',
@@ -85,10 +87,10 @@ class BookingControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $container = $client->getContainer();
-        $container->set('App\Service\HomeDataService', 
-            new \App\Service\HomeDataService(self::$testCottagesFile));
-        $container->set('App\Service\BookingService', 
-            new \App\Service\BookingService(self::$testBookingsFile, self::$logger));
+        $container->set(HomeDataService::class, 
+            new HomeDataService(self::$testCottagesFile));
+        $container->set(BookingService::class, 
+            new BookingService(self::$testBookingsFile, self::$logger));
 
         $client->request(
             'POST',
@@ -110,10 +112,10 @@ class BookingControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $container = $client->getContainer();
-        $container->set('App\Service\HomeDataService', 
-            new \App\Service\HomeDataService(self::$testCottagesFile));
-        $container->set('App\Service\BookingService', 
-            new \App\Service\BookingService(self::$testBookingsFile, self::$logger));
+        $container->set(HomeDataService::class, 
+            new HomeDataService(self::$testCottagesFile));
+        $container->set(BookingService::class, 
+            new BookingService(self::$testBookingsFile, self::$logger));
 
         $client->request(
             'POST',
