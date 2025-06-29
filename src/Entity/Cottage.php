@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Repository\CottageRepository;
 
 #[ORM\Entity(repositoryClass: CottageRepository::class)]
 class Cottage
@@ -31,7 +32,6 @@ class Cottage
         $this->bookings = new ArrayCollection();
     }
 
-    // Геттеры и сеттеры
     public function getId(): ?int
     {
         return $this->id;

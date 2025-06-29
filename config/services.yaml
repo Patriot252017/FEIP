@@ -1,6 +1,4 @@
 parameters:
-    cottages_data_path: '%kernel.project_dir%/data/dev/cottages.csv'
-    bookings_data_path: '%kernel.project_dir%/data/dev/bookings.csv'
 
 services:
     _defaults:
@@ -8,17 +6,19 @@ services:
         autoconfigure: true
         public: false
 
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Tests/'
+
+    App\Command\InitDataCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
 
     App\Controller\:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
         public: true
-
-
-    App\Service\HomeDataService:
-        arguments:
-            $cottagesFile: '%cottages_data_path%'
-
-    App\Service\BookingService:
-        arguments:
-            $bookingsFile: '%bookings_data_path%'

@@ -30,4 +30,47 @@ class Booking
         $this->createdAt = new \DateTime();
     }
 
+    public function getId(): int
+{
+    return $this->id;
+}
+
+public function getPhone(): string
+{
+    return $this->phone;
+}
+
+public function setPhone(string $phone): self
+{
+    $this->phone = $phone;
+    return $this;
+}
+
+public function getComment(): ?string
+{
+    return $this->comment;
+}
+
+public function setComment(?string $comment): self
+{
+    $this->comment = $comment;
+    return $this;
+}
+
+public function getCreatedAt(): \DateTimeInterface
+{
+    return $this->createdAt;
+}
+
+public function getCottage(): Cottage
+{
+    return $this->cottage;
+}
+
+public function setCottage(Cottage $cottage): self
+{
+    $this->cottage = $cottage;
+    return $this;
+}
+
 }
