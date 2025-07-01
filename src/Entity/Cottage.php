@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
 use App\Repository\CottageRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CottageRepository::class)]
 class Cottage
@@ -19,10 +21,10 @@ class Cottage
     private ?string $amenities = null;
 
     #[ORM\Column(type: 'integer')]
-    private int $beds;
+    private int $beds = 0;
 
     #[ORM\Column(type: 'integer')]
-    private int $distanceFromSea;
+    private int $distanceFromSea = 0;
 
     #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'cottage')]
     private Collection $bookings;
@@ -70,6 +72,7 @@ class Cottage
         return $this;
     }
 
+    /** @return Collection<Booking> */
     public function getBookings(): Collection
     {
         return $this->bookings;

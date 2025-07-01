@@ -19,5 +19,14 @@
     </projectFiles>
 
     <issueHandlers>
+        <PossiblyFalseArgument>
+            <errorLevel type="suppress"/>
+        </PossiblyFalseArgument>
+        <PossiblyUnusedMethod>
+            <errorLevel type="info"/>
+        </PossiblyUnusedMethod>
+        <PossiblyUnusedProperty>
+            <errorLevel type="info"/>
+        </PossiblyUnusedProperty>
     </issueHandlers>
 </psalm>

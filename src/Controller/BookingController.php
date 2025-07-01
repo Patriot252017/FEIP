@@ -1,49 +1,44 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
-use Symfony\Component\Routing\Attribute\Route;
+use App\Service\BookingService;
+use App\Service\HomeDataService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response; 
-use App\Service\HomeDataService;
-use App\Service\BookingService;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
-class BookingController
+final class BookingController
 {
     public function __construct(
-        private HomeDataService $homeDataService,
-        private BookingService $bookingService
-    ) {}
+        private readonly HomeDataService $homeDataService,
+        private readonly BookingService $bookingService,
+    ) {
+    }
 
     #[Route('/api/cottages', name: 'api_cottages', methods: ['GET'])]
     public function getCottages(): JsonResponse
     {
-        $cottages = $this->homeDataService->getAvailableCottages();
-        return new JsonResponse($cottages);
+        return new JsonResponse($this->homeDataService->getAvailableCottages());
     }
 
     #[Route('/api/bookings', name: 'api_bookings_create', methods: ['POST'])]
-    public function createBooking(Request $request, BookingService $bookingService): JsonResponse
+    public function createBooking(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-    
-        if (!isset($data['phone']) || !isset($data['cottageId'])) {
+        $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        if (!isset($data['phone'], $data['cottageId'])) {
             return new JsonResponse(
                 ['status' => 'error', 'message' => 'Missing required fields'],
                 Response::HTTP_BAD_REQUEST
             );
         }
 
-        if ($data['cottageId'] <= 0) {
-            return new JsonResponse(
-                ['status' => 'error', 'message' => 'Invalid cottage ID'],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-
-        $success = $bookingService->createBooking(
-            $data['phone'],
+        $success = $this->bookingService->createBooking(
+            (string)$data['phone'],
             (int)$data['cottageId'],
             $data['comment'] ?? null
         );
@@ -55,10 +50,10 @@ class BookingController
     }
 
     #[Route('/api/bookings/{id}', name: 'api_bookings_update', methods: ['PUT'])]
-    public function updateBooking(string $id, Request $request, BookingService $bookingService): JsonResponse
+    public function updateBooking(string $id, Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $success = $bookingService->updateBooking($id, $data['comment'] ?? '');
+        $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $success = $this->bookingService->updateBooking($id, $data['comment'] ?? '');
 
         return new JsonResponse(
             ['status' => $success ? 'success' : 'error'],
@@ -67,14 +62,14 @@ class BookingController
     }
 
     #[Route('/api/bookings/{id}', name: 'api_booking_get', methods: ['GET'])]
-    public function getBooking(string $id, BookingService $bookingService): JsonResponse
+    public function getBooking(string $id): JsonResponse
     {
-        $booking = $bookingService->getBooking($id);
-    
-        if (!$booking) {
+        $booking = $this->bookingService->getBooking($id);
+
+        if ($booking === null) {
             return new JsonResponse(
-                data: ['status' => 'error', 'message' => 'Booking not found'],
-                status: Response::HTTP_NOT_FOUND
+                ['status' => 'error', 'message' => 'Booking not found'],
+                Response::HTTP_NOT_FOUND
             );
         }
 

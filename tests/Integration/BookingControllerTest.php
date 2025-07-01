@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Controller;
 
 use App\Entity\Cottage;
@@ -8,17 +10,18 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class BookingControllerTest extends WebTestCase
 {
     private $client;
+
     private $em;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
         $this->em = static::getContainer()->get('doctrine')->getManager();
-        
+
         $this->em->getConnection()->executeStatement('DELETE FROM booking');
         $this->em->getConnection()->executeStatement('DELETE FROM cottage');
         $this->em->getConnection()->executeStatement('ALTER TABLE cottage AUTO_INCREMENT = 1');
-        
+
         $cottage = new Cottage();
         $cottage->setBeds(2);
         $cottage->setDistanceFromSea(50);
@@ -38,11 +41,11 @@ class BookingControllerTest extends WebTestCase
         );
 
         $response = $this->client->getResponse();
-        
+
         $this->assertEquals(201, $response->getStatusCode());
-        
+
         $this->assertTrue($response->headers->contains('Content-Type', 'application/json'));
-        
+
         $responseData = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('status', $responseData);
         $this->assertEquals('success', $responseData['status']);
@@ -51,11 +54,11 @@ class BookingControllerTest extends WebTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         if ($this->em->getConnection()->isTransactionActive()) {
             $this->em->rollback();
         }
-        
+
         $this->em->close();
         $this->em = null;
         $this->client = null;

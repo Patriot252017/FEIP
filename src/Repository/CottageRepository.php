@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Cottage;
@@ -15,6 +17,7 @@ class CottageRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Cottage::class);
     }
+
     public function findByDistanceFromSea(int $distance): array
     {
         return $this->createQueryBuilder('c')

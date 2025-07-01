@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Service;
 
-use App\Entity\Booking;
 use App\Entity\Cottage;
 use App\Repository\BookingRepository;
 use App\Repository\CottageRepository;
@@ -14,9 +15,13 @@ use Psr\Log\LoggerInterface;
 class BookingServiceTest extends TestCase
 {
     private BookingService $service;
+
     private $cottageRepoMock;
+
     private $bookingRepoMock;
+
     private $emMock;
+
     private $loggerMock;
 
     protected function setUp(): void
@@ -38,7 +43,7 @@ class BookingServiceTest extends TestCase
     {
         $cottage = new Cottage();
         $this->cottageRepoMock->method('find')->willReturn($cottage);
-        
+
         $this->emMock->expects($this->once())->method('persist');
         $this->emMock->expects($this->once())->method('flush');
 
