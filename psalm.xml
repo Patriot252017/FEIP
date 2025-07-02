@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="3"
+    cacheDirectory="var/cache/.psalm-cache"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src"/>
+        <directory name="tests"/>
+        <ignoreFiles>
+            <directory name="vendor"/>
+            <directory name="var"/>
+            <directory name="bin"/>
+            <file name="config/preload.php"/>
+            <file name="public/index.php"/>
+            <file name="config/bundles.php"/>
+        </ignoreFiles>
+    </projectFiles>
+
+    <plugins>
+        <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
+    </plugins>
+
+    <issueHandlers>
+        <!-- Основные подавления для продакшн-кода -->
+        <PossiblyUnusedMethod>
+            <errorLevel type="suppress">
+                <directory name="src/Entity"/>
+                <directory name="src/Repository"/>
+            </errorLevel>
+        </PossiblyUnusedMethod>
+        <UnusedParam>
+            <errorLevel type="suppress">
+                <directory name="src/Repository"/>
+            </errorLevel>
+        </UnusedParam>
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <file name="src/Command/InitDataCommand.php"/>
+                <file name="src/Controller/BookingController.php"/>
+            </errorLevel>
+        </UnusedClass>
+
+        <!-- Минимальные необходимые подавления для тестов -->
+        <PossiblyNullReference>
+            <errorLevel type="suppress">
+                <directory name="tests"/>
+            </errorLevel>
+        </PossiblyNullReference>
+        <PossibleRawObjectIteration>
+            <errorLevel type="info">
+                <directory name="tests"/>
+            </errorLevel>
+        </PossibleRawObjectIteration>
+    </issueHandlers>
+</psalm>
