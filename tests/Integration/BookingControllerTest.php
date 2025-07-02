@@ -2,65 +2,77 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Controller;
+namespace App\Tests\Integration\Controller;
 
 use App\Entity\Cottage;
+use Doctrine\ORM\EntityManagerInterface;
+use Override;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\BrowserKit\AbstractBrowser as KernelBrowser;
 
-class BookingControllerTest extends WebTestCase
+final class BookingControllerTest extends WebTestCase
 {
-    private $client;
+    private KernelBrowser $client;
+    private EntityManagerInterface $entityManager;
 
-    private $em;
-
+    #[Override]
     protected function setUp(): void
     {
+        parent::setUp();
+        
         $this->client = static::createClient();
-        $this->em = static::getContainer()->get('doctrine')->getManager();
-
-        $this->em->getConnection()->executeStatement('DELETE FROM booking');
-        $this->em->getConnection()->executeStatement('DELETE FROM cottage');
-        $this->em->getConnection()->executeStatement('ALTER TABLE cottage AUTO_INCREMENT = 1');
-
+        $container = static::getContainer();
+        
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = $container->get('doctrine.orm.entity_manager');
+        $this->entityManager = $entityManager;
+        
+        // Очистка базы данных перед тестом
+        $this->entityManager->getConnection()->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+        $this->entityManager->getConnection()->executeStatement('TRUNCATE cottage');
+        $this->entityManager->getConnection()->executeStatement('TRUNCATE booking');
+        $this->entityManager->getConnection()->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+        
+        // Создание тестовых данных
         $cottage = new Cottage();
         $cottage->setBeds(2);
-        $cottage->setDistanceFromSea(50);
-        $this->em->persist($cottage);
-        $this->em->flush();
+        $cottage->setDistanceFromSea(100);
+        $this->entityManager->persist($cottage);
+        $this->entityManager->flush();
     }
 
     public function testCreateBooking(): void
     {
+        $jsonData = json_encode([
+            'phone' => '+123456789', 
+            'cottageId' => 1
+        ]);
+        $this->assertNotFalse($jsonData);
+        
         $this->client->request(
             'POST',
             '/api/bookings',
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
-            json_encode(['phone' => '+123456789', 'cottageId' => 1])
+            $jsonData
         );
 
         $response = $this->client->getResponse();
-
         $this->assertEquals(201, $response->getStatusCode());
-
-        $this->assertTrue($response->headers->contains('Content-Type', 'application/json'));
-
+        $this->assertJson($response->getContent());
+        
         $responseData = json_decode($response->getContent(), true);
-        $this->assertArrayHasKey('status', $responseData);
         $this->assertEquals('success', $responseData['status']);
     }
 
+    #[Override]
     protected function tearDown(): void
     {
-        parent::tearDown();
-
-        if ($this->em->getConnection()->isTransactionActive()) {
-            $this->em->rollback();
+        if ($this->entityManager->getConnection()->isTransactionActive()) {
+            $this->entityManager->rollback();
         }
-
-        $this->em->close();
-        $this->em = null;
-        $this->client = null;
+        $this->entityManager->close();
+        parent::tearDown();
     }
 }

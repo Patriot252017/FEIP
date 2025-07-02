@@ -11,13 +11,18 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<Cottage>
  */
-class CottageRepository extends ServiceEntityRepository
+final class CottageRepository extends ServiceEntityRepository
 {
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress UnusedParam
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Cottage::class);
     }
 
+    /** @psalm-suppress PossiblyUnusedMethod */
     public function findByDistanceFromSea(int $distance): array
     {
         return $this->createQueryBuilder('c')
@@ -27,6 +32,7 @@ class CottageRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** @psalm-suppress PossiblyUnusedMethod */
     public function findAvailable(): array
     {
         return $this->createQueryBuilder('c')

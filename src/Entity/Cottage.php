@@ -10,7 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CottageRepository::class)]
-class Cottage
+final class Cottage
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -29,6 +29,7 @@ class Cottage
     #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'cottage')]
     private Collection $bookings;
 
+    /** @psalm-suppress PossiblyUnusedMethod */
     public function __construct()
     {
         $this->bookings = new ArrayCollection();
@@ -44,9 +45,11 @@ class Cottage
         return $this->amenities;
     }
 
+    /** @psalm-suppress PossiblyUnusedMethod */
     public function setAmenities(?string $amenities): self
     {
         $this->amenities = $amenities;
+
         return $this;
     }
 
@@ -55,9 +58,11 @@ class Cottage
         return $this->beds;
     }
 
+    /** @psalm-suppress PossiblyUnusedMethod */
     public function setBeds(int $beds): self
     {
         $this->beds = $beds;
+
         return $this;
     }
 
@@ -66,13 +71,15 @@ class Cottage
         return $this->distanceFromSea;
     }
 
+    /** @psalm-suppress PossiblyUnusedMethod */
     public function setDistanceFromSea(int $distanceFromSea): self
     {
         $this->distanceFromSea = $distanceFromSea;
+
         return $this;
     }
 
-    /** @return Collection<Booking> */
+    /** @return Collection<int, Booking> */
     public function getBookings(): Collection
     {
         return $this->bookings;

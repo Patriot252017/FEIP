@@ -6,8 +6,9 @@ namespace App\Service;
 
 use App\Repository\CottageRepository;
 
-class HomeDataService
+final class HomeDataService
 {
+    /** @psalm-suppress PossiblyUnusedMethod */
     public function __construct(
         private CottageRepository $cottageRepository,
     ) {
@@ -17,13 +18,11 @@ class HomeDataService
     {
         $cottages = $this->cottageRepository->findAll();
 
-        return array_map(function ($cottage) {
-            return [
-                'id' => $cottage->getId(),
-                'amenities' => $cottage->getAmenities(),
-                'beds' => $cottage->getBeds(),
-                'distanceFromSea' => $cottage->getDistanceFromSea(),
-            ];
-        }, $cottages);
+        return array_map(fn ($cottage) => [
+            'id' => $cottage->getId(),
+            'amenities' => $cottage->getAmenities(),
+            'beds' => $cottage->getBeds(),
+            'distanceFromSea' => $cottage->getDistanceFromSea(),
+        ], $cottages);
     }
 }

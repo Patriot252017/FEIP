@@ -6,14 +6,18 @@ namespace App\Tests\Integration\Repository;
 
 use App\Entity\Booking;
 use App\Entity\Cottage;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
+use Override;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class CottageRepositoryTest extends KernelTestCase
+final class CottageRepositoryTest extends KernelTestCase
 {
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    private $cottageRepository;
+    private \Doctrine\Persistence\ObjectRepository $cottageRepository;
 
+    #[Override]
     protected function setUp(): void
     {
         $kernel = self::bootKernel();
@@ -46,13 +50,8 @@ class CottageRepositoryTest extends KernelTestCase
         $cottage->setBeds(3);
         $cottage->setDistanceFromSea(50);
 
-        $booking1 = new Booking();
-        $booking1->setPhone('+123456789');
-        $booking1->setCottage($cottage);
-
-        $booking2 = new Booking();
-        $booking2->setPhone('+987654321');
-        $booking2->setCottage($cottage);
+        $booking1 = new Booking($cottage, '+123456789');
+        $booking2 = new Booking($cottage, '+987654321');
 
         $this->entityManager->persist($cottage);
         $this->entityManager->persist($booking1);
@@ -62,18 +61,20 @@ class CottageRepositoryTest extends KernelTestCase
         $this->entityManager->clear();
         $loadedCottage = $this->cottageRepository->find($cottage->getId());
 
+        /** @var Collection<int, Booking> $bookings */
         $bookings = $loadedCottage->getBookings();
-        $this->assertCount(2, $bookings, 'Должно быть 2 бронирования');
+        $bookingsArray = $bookings->toArray();
+        $this->assertCount(2, $bookingsArray);
 
-        foreach ($bookings as $booking) {
+        foreach ($bookingsArray as $booking) {
             $this->assertEquals($loadedCottage->getId(), $booking->getCottage()->getId());
         }
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         parent::tearDown();
         $this->entityManager->close();
-        $this->entityManager = null;
     }
 }

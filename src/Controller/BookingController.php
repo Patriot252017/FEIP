@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * @used-by \App\Routing\RouteLoader
+ */
+#[Route('/api')]
 final class BookingController
 {
     public function __construct(
@@ -19,13 +23,13 @@ final class BookingController
     ) {
     }
 
-    #[Route('/api/cottages', name: 'api_cottages', methods: ['GET'])]
+    #[Route('/cottages', name: 'api_cottages', methods: ['GET'])]
     public function getCottages(): JsonResponse
     {
         return new JsonResponse($this->homeDataService->getAvailableCottages());
     }
 
-    #[Route('/api/bookings', name: 'api_bookings_create', methods: ['POST'])]
+    #[Route('/bookings', name: 'api_bookings_create', methods: ['POST'])]
     public function createBooking(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -38,8 +42,8 @@ final class BookingController
         }
 
         $success = $this->bookingService->createBooking(
-            (string)$data['phone'],
-            (int)$data['cottageId'],
+            (string) $data['phone'],
+            (int) $data['cottageId'],
             $data['comment'] ?? null
         );
 
@@ -49,7 +53,7 @@ final class BookingController
         );
     }
 
-    #[Route('/api/bookings/{id}', name: 'api_bookings_update', methods: ['PUT'])]
+    #[Route('/bookings/{id}', name: 'api_bookings_update', methods: ['PUT'])]
     public function updateBooking(string $id, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -61,12 +65,12 @@ final class BookingController
         );
     }
 
-    #[Route('/api/bookings/{id}', name: 'api_booking_get', methods: ['GET'])]
+    #[Route('/bookings/{id}', name: 'api_booking_get', methods: ['GET'])]
     public function getBooking(string $id): JsonResponse
     {
         $booking = $this->bookingService->getBooking($id);
 
-        if ($booking === null) {
+        if (null === $booking) {
             return new JsonResponse(
                 ['status' => 'error', 'message' => 'Booking not found'],
                 Response::HTTP_NOT_FOUND

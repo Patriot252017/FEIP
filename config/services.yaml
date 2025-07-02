@@ -1,4 +1,5 @@
 parameters:
+    env(APP_ENV): 'dev'
 
 services:
     _defaults:
@@ -14,11 +15,12 @@ services:
             - '../src/Kernel.php'
             - '../src/Tests/'
 
-    App\Command\InitDataCommand:
-        arguments:
-            $projectDir: '%kernel.project_dir%'
-
     App\Controller\:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
         public: true
+
+    App\Command\InitDataCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+        tags: ['console.command']

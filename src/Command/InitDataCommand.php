@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use Exception;
 use Override;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -19,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class InitDataCommand extends Command
 {
     public function __construct(
-        private readonly string $projectDir
+        private readonly string $projectDir,
     ) {
         parent::__construct();
     }
@@ -47,8 +48,9 @@ final class InitDataCommand extends Command
             ]);
 
             return Command::SUCCESS;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $io->error('Error: ' . $e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -79,18 +81,20 @@ final class InitDataCommand extends Command
     private function writeCsvFile(string $path, array $data): void
     {
         $dir = dirname($path);
+
         if (!file_exists($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $dir));
         }
 
         $file = fopen($path, 'wb');
-        if ($file === false) {
+
+        if (false === $file) {
             throw new RuntimeException('Failed to open file for writing');
         }
 
         try {
             foreach ($data as $row) {
-                if (fputcsv($file, $row) === false) {
+                if (false === fputcsv($file, $row)) {
                     throw new RuntimeException('Failed to write data to file');
                 }
             }

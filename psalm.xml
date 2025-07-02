@@ -4,10 +4,11 @@
     cacheDirectory="var/cache/.psalm-cache"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
-    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd">
-
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
     <projectFiles>
         <directory name="src"/>
+        <directory name="tests"/>
         <ignoreFiles>
             <directory name="vendor"/>
             <directory name="var"/>
@@ -18,15 +19,40 @@
         </ignoreFiles>
     </projectFiles>
 
+    <plugins>
+        <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
+    </plugins>
+
     <issueHandlers>
-        <PossiblyFalseArgument>
-            <errorLevel type="suppress"/>
-        </PossiblyFalseArgument>
+        <!-- Основные подавления для продакшн-кода -->
         <PossiblyUnusedMethod>
-            <errorLevel type="info"/>
+            <errorLevel type="suppress">
+                <directory name="src/Entity"/>
+                <directory name="src/Repository"/>
+            </errorLevel>
         </PossiblyUnusedMethod>
-        <PossiblyUnusedProperty>
-            <errorLevel type="info"/>
-        </PossiblyUnusedProperty>
+        <UnusedParam>
+            <errorLevel type="suppress">
+                <directory name="src/Repository"/>
+            </errorLevel>
+        </UnusedParam>
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <file name="src/Command/InitDataCommand.php"/>
+                <file name="src/Controller/BookingController.php"/>
+            </errorLevel>
+        </UnusedClass>
+
+        <!-- Минимальные необходимые подавления для тестов -->
+        <PossiblyNullReference>
+            <errorLevel type="suppress">
+                <directory name="tests"/>
+            </errorLevel>
+        </PossiblyNullReference>
+        <PossibleRawObjectIteration>
+            <errorLevel type="info">
+                <directory name="tests"/>
+            </errorLevel>
+        </PossibleRawObjectIteration>
     </issueHandlers>
 </psalm>

@@ -10,8 +10,9 @@ use App\Repository\CottageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
-class BookingService
+final class BookingService
 {
+    /** @psalm-suppress PossiblyUnusedMethod */
     public function __construct(
         private BookingRepository $bookingRepository,
         private CottageRepository $cottageRepository,
@@ -23,6 +24,7 @@ class BookingService
     public function createBooking(string $phone, int $cottageId, ?string $comment = null): bool
     {
         $cottage = $this->cottageRepository->find($cottageId);
+
         if (!$cottage) {
             $this->logger->error('Cottage not found', ['cottageId' => $cottageId]);
 
@@ -30,8 +32,6 @@ class BookingService
         }
 
         $booking = new Booking($cottage, $phone);
-        $booking->setPhone($phone);
-        $booking->setCottage($cottage);
         $booking->setComment($comment);
 
         $this->entityManager->persist($booking);
@@ -43,6 +43,7 @@ class BookingService
     public function updateBooking(string $id, string $newComment): bool
     {
         $booking = $this->bookingRepository->find($id);
+
         if (!$booking) {
             $this->logger->warning('Booking not found', ['id' => $id]);
 
@@ -58,6 +59,7 @@ class BookingService
     public function getBooking(string $id): ?array
     {
         $booking = $this->bookingRepository->find($id);
+
         if (!$booking) {
             return null;
         }
