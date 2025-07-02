@@ -13,6 +13,8 @@
         "doctrine/orm": "^3.4",
         "sonata-project/admin-bundle": "*",
         "sonata-project/doctrine-orm-admin-bundle": "*",
+        "nelmio/api-doc-bundle": "*",
+        "symfony/asset": "7.2.*",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
         "symfony/flex": "^2",
@@ -20,6 +22,7 @@
         "symfony/framework-bundle": "7.2.*",
         "symfony/runtime": "7.2.*",
         "symfony/security-bundle": "7.2.*",
+        "symfony/twig-bundle": "7.2.*",
         "symfony/validator": "7.2.*",
         "symfony/yaml": "7.2.*"
     },
