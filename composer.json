@@ -11,6 +11,8 @@
         "doctrine/doctrine-bundle": "^2.15",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.4",
+        "sonata-project/admin-bundle": "*",
+        "sonata-project/doctrine-orm-admin-bundle": "*",
         "nelmio/api-doc-bundle": "*",
         "symfony/asset": "7.2.*",
         "symfony/console": "7.2.*",

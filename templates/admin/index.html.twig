@@ -1,20 +1,31 @@
-{% extends 'base.html.twig' %}
+{% extends '@SonataAdmin/standard_layout.html.twig' %}
 
-{% block title %}Hello AdminController!{% endblock %}
+{% block sonata_nav %}{% endblock %}
+{% block logo %}{% endblock %}
+{% block sonata_left_side %}{% endblock %}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+{% block body_attributes %}class="sonata-bc login-page"{% endblock %}
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+{% block sonata_wrapper %}
+    <div class="login-box">
+        <div class="login-logo">
+            <h1>Admin Panel</h1>
+        </div>
+        <div class="login-box-body">
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>E:/FEIP/src/Controller/AdminController.php</code></li>
-        <li>Your template at <code>E:/FEIP/templates/admin/index.html.twig</code></li>
-    </ul>
-</div>
+            <form action="{{ path('admin_login') }}" method="post">
+                <div class="form-group">
+                    <input type="email" class="form-control" name="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                </div>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}
